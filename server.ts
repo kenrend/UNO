@@ -5,8 +5,8 @@ import { Server } from 'socket.io';
 import next from 'next';
 
 const dev = process.env.NODE_ENV !== 'production';
-const currentPort = 3000;
-const hostname = '0.0.0.0';
+const currentPort = parseInt(process.env.PORT || '3000', 10);
+const hostname = process.env.HOSTNAME || '0.0.0.0';
 
 // Custom server with Socket.IO integration
 async function createCustomServer() {
@@ -35,7 +35,7 @@ async function createCustomServer() {
     const io = new Server(server, {
       path: '/api/socketio',
       cors: {
-        origin: "*",
+        origin: process.env.SOCKET_IO_CORS_ORIGIN || "*",
         methods: ["GET", "POST"]
       }
     });
@@ -46,6 +46,7 @@ async function createCustomServer() {
     server.listen(currentPort, hostname, () => {
       console.log(`> Ready on http://${hostname}:${currentPort}`);
       console.log(`> Socket.IO server running at ws://${hostname}:${currentPort}/api/socketio`);
+      console.log(`> Environment: ${process.env.NODE_ENV}`);
     });
 
   } catch (err) {

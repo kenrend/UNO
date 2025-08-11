@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  uno-game:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=file:./dev.db
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+
+  # Optional: Add a reverse proxy like Nginx for production
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/nginx/ssl
+    depends_on:
+      - uno-game
+    restart: unless-stopped
+    profiles:
+      - proxy

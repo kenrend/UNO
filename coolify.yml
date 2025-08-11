@@ -1,0 +1,44 @@
+# Coolify Configuration for Uno Game
+# Deploy with: coolify deploy
+
+name: uno-game
+description: Multiplayer UNO Card Game
+
+services:
+  - name: uno-game
+    type: docker
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=file:./data/dev.db
+    volumes:
+      - ./data:/app/data
+    health_check:
+      path: /api/health
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart_policy: unless-stopped
+
+# Optional: Database service if you want to use PostgreSQL instead of SQLite
+# Uncomment the following section if you prefer PostgreSQL
+#
+#  - name: postgres
+#    type: docker
+#    image: postgres:15-alpine
+#    environment:
+#      - POSTGRES_DB=uno_game
+#      - POSTGRES_USER=uno_user
+#      - POSTGRES_PASSWORD=uno_password
+#    volumes:
+#      - postgres_data:/var/lib/postgresql/data
+#    ports:
+#      - "5432:5432"
+#    restart_policy: unless-stopped
+#
+# volumes:
+#   postgres_data:
