@@ -51,8 +51,13 @@ COPY --from=builder /app/src ./src
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
-# Create data directory for database
+# Create data directory for database and initialize it
 RUN mkdir -p data && chown nextjs:nodejs data
+# Copy database initialization script
+COPY --from=builder /app/init-database.sh ./
+RUN chmod +x init-database.sh
+# Run database initialization as root to create the database file
+RUN ./init-database.sh
 
 USER nextjs
 
@@ -60,5 +65,6 @@ EXPOSE 3000
 
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
+ENV DATABASE_URL="file:/app/data/dev.db"
 
 CMD ["npx", "tsx", "server.ts"]

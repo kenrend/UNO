@@ -4,6 +4,9 @@
 mkdir -p /app/data
 chown -R nextjs:nodejs /app/data
 
+# Set DATABASE_URL environment variable for build time
+export DATABASE_URL="file:/app/data/dev.db"
+
 # Generate Prisma client
 npx prisma generate
 
