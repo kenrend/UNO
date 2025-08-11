@@ -1,0 +1,42 @@
+# Most Reliable Dockerfile for Coolify deployment
+FROM node:18-alpine
+
+# Install dependencies and create user
+RUN apk add --no-cache libc6-compat && \
+    addgroup -g 1001 -S nodejs && \
+    adduser -S nextjs -u 1001
+
+WORKDIR /app
+
+# Copy package files and install dependencies
+COPY package*.json ./
+RUN npm ci
+
+# Copy source code
+COPY . .
+
+# Generate Prisma client
+RUN npx prisma generate
+
+# Build the application
+RUN npm run build
+
+# Create data directory and set permissions
+RUN mkdir -p data && \
+    chown -R nextjs:nodejs /app
+
+# Switch to non-root user
+USER nextjs
+
+# Expose port
+EXPOSE 3000
+
+# Set environment variables
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
+ENV DATABASE_URL=file:./data/dev.db
+ENV SOCKET_IO_CORS_ORIGIN=*
+
+# Start the application
+CMD ["npx", "tsx", "server.ts"]
