@@ -13,6 +13,71 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Game {
+  id              String   @id @default(cuid())
+  code            String   @unique
+  status          GameStatus @default(WAITING)
+  currentPlayerIndex Int     @default(0)
+  direction       Int      @default(1) // 1 for clockwise, -1 for counter-clockwise
+  deck            String   // JSON string of card IDs
+  discardPile     String   // JSON string of card IDs
+  currentColor    String?  // Current color in play
+  currentValue    String?  // Current value in play
+  maxPlayers      Int      @default(4)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  players         Player[]
+}
+
+model Player {
+  id        String   @id @default(cuid())
+  gameId    String
+  name      String
+  socketId  String?
+  hand      String   // JSON string of card IDs
+  position  Int      // Position around the table (0-3)
+  isReady   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  game      Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  
+  @@unique([gameId, socketId])
+}
+
+model Card {
+  id     String @id @default(cuid())
+  color  CardColor
+  value  String
+  type   CardType @default(NUMBER)
+  
+  @@unique([color, value, type])
+}
+
+enum GameStatus {
+  WAITING
+  PLAYING
+  FINISHED
+}
+
+enum CardColor {
+  RED
+  BLUE
+  GREEN
+  YELLOW
+  WILD
+}
+
+enum CardType {
+  NUMBER
+  SKIP
+  REVERSE
+  DRAW_TWO
+  WILD
+  WILD_DRAW_FOUR
+}
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
