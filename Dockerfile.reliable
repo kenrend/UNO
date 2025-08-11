@@ -15,17 +15,25 @@ RUN npm ci
 # Copy source code
 COPY . .
 
+# Copy database initialization script
+COPY init-database.sh /app/init-database.sh
+RUN chmod +x /app/init-database.sh
+
 # Generate Prisma client
 RUN npx prisma generate
 
 # Build the application
 RUN npm run build
 
-# Create data directory and set permissions
-RUN mkdir -p data && \
-    chown -R nextjs:nodejs /app
+# Switch to root user to create directories and initialize database
+USER root
 
-# Switch to non-root user
+# Create data directory and initialize database
+RUN mkdir -p /app/data && \
+    chown -R nextjs:nodejs /app && \
+    /app/init-database.sh
+
+# Switch to non-root user for running the application
 USER nextjs
 
 # Expose port

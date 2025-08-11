@@ -15,14 +15,26 @@ RUN npm ci
 # Copy source code
 COPY . .
 
+# Copy database initialization script
+COPY init-database.sh /app/init-database.sh
+RUN chmod +x /app/init-database.sh
+
 # Generate Prisma client
 RUN npx prisma generate
 
 # Build the application
 RUN npm run build
 
-# Create data directory
-RUN mkdir -p data
+# Create data directory and initialize database as root
+USER root
+RUN mkdir -p /app/data && \
+    /app/init-database.sh
+
+# Switch to non-root user for security
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nextjs -u 1001 && \
+    chown -R nextjs:nodejs /app
+USER nextjs
 
 # Expose port
 EXPOSE 3000
@@ -32,6 +44,7 @@ ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 ENV DATABASE_URL=file:./data/dev.db
+ENV SOCKET_IO_CORS_ORIGIN=*
 
 # Start the application
 CMD ["npx", "tsx", "server.ts"]
