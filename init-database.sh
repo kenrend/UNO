@@ -17,6 +17,9 @@ npx prisma db push
 if [ -f "/app/data/dev.db" ]; then
     chown nextjs:nodejs /app/data/dev.db
     chmod 644 /app/data/dev.db
+    echo "Database file created and permissions set"
+else
+    echo "Warning: Database file was not created"
 fi
 
 echo "Database initialization completed"
