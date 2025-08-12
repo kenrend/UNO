@@ -57,7 +57,7 @@ RUN chmod +x init-database.sh
 # Create entrypoint script that initializes database at runtime
 RUN echo '#!/bin/sh\n\
 echo "Starting entrypoint script..."\n\
-# Set DATABASE_URL environment variable for production\n\
+# Set DATABASE_URL for production environment\n\
 export DATABASE_URL="file:/app/data/dev.db"\n\
 echo "DATABASE_URL set to: $DATABASE_URL"\n\
 # Initialize database as root\n\
