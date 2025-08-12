@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { io } from 'socket.io-client';
+import getSocket, { connectSocket, disconnectSocket } from '@/lib/socket-client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,9 +20,7 @@ export default function SocketDemo() {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    const socketInstance = io({
-      path: '/api/socketio',
-    });
+    const socketInstance = connectSocket();
 
     setSocket(socketInstance);
 
