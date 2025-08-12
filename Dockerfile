@@ -57,6 +57,9 @@ RUN chmod +x init-database.sh
 # Create entrypoint script that initializes database at runtime
 RUN echo '#!/bin/sh\n\
 echo "Starting entrypoint script..."\n\
+# Set DATABASE_URL environment variable for production\n\
+export DATABASE_URL="file:/app/data/dev.db"\n\
+echo "DATABASE_URL set to: $DATABASE_URL"\n\
 # Initialize database as root\n\
 echo "Running database initialization..."\n\
 ./init-database.sh\n\
@@ -67,7 +70,7 @@ fi\n\
 echo "Database initialization completed successfully"\n\
 # Switch to nextjs user and start the application\n\
 echo "Starting application as nextjs user..."\n\
-exec su - nextjs -c "cd /app && npx tsx server.ts"\n\
+exec su - nextjs -c "cd /app && DATABASE_URL=file:/app/data/dev.db npx tsx server.ts"\n\
 ' > entrypoint.sh && chmod +x entrypoint.sh
 
 EXPOSE 3000

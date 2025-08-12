@@ -1,15 +1,11 @@
 #!/bin/sh
 
 echo "Starting database initialization..."
+echo "DATABASE_URL set to: $DATABASE_URL"
 
 # Create data directory with proper permissions
 mkdir -p /app/data
 chown -R nextjs:nodejs /app/data
-
-# Set DATABASE_URL environment variable
-export DATABASE_URL="file:/app/data/dev.db"
-
-echo "DATABASE_URL set to: $DATABASE_URL"
 
 # Change to app directory
 cd /app
