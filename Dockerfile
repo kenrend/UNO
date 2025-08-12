@@ -56,9 +56,17 @@ RUN chmod +x init-database.sh
 
 # Create entrypoint script that initializes database at runtime
 RUN echo '#!/bin/sh\n\
+echo "Starting entrypoint script..."\n\
 # Initialize database as root\n\
+echo "Running database initialization..."\n\
 ./init-database.sh\n\
+if [ $? -ne 0 ]; then\n\
+    echo "Database initialization failed, exiting..."\n\
+    exit 1\n\
+fi\n\
+echo "Database initialization completed successfully"\n\
 # Switch to nextjs user and start the application\n\
+echo "Starting application as nextjs user..."\n\
 exec su - nextjs -c "cd /app && npx tsx server.ts"\n\
 ' > entrypoint.sh && chmod +x entrypoint.sh
 
